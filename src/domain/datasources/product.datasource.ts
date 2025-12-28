@@ -1,5 +1,5 @@
-import { CreateProductDTO } from "../dtos/createProduct.dto";
-import { UpdateProductDTO } from "../dtos/updateProduct.dto";
+import { CreateProductDTO } from "../dtos/product/createProduct.dto";
+import { UpdateProductDTO } from "../dtos/product/updateProduct.dto";
 import { ProductEntity } from "../entities/product.entity";
 
 export abstract class ProductDatasource {

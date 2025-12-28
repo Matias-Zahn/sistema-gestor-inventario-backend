@@ -1,5 +1,7 @@
 import express, { Router } from 'express';
 import path from 'path';
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
 
 interface Options {
   port: number;
@@ -15,6 +17,7 @@ export class Server {
   private readonly port: number;
   private readonly publicPath: string;
   private readonly routes: Router;
+  private swaggerDocument = YAML.load(path.join(__dirname, '../../openapi.yaml'));
 
   constructor(options: Options) {
     const { port, routes, public_path = 'public' } = options;
@@ -37,6 +40,8 @@ export class Server {
 
     //* Routes
     this.app.use( this.routes );
+
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(this.swaggerDocument));
 
     //* SPA /^\/(?!api).*/  <== Únicamente si no empieza con la palabra api
     this.app.get(/^\/(?!api).*/, (req, res) => {

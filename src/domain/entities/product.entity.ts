@@ -1,7 +1,5 @@
 import { CustomError } from "../errors/customError";
 
-interface Product {}
-
 export class ProductEntity {
   constructor(
     public id: string,

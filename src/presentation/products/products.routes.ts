@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ProductController } from "./products.controller";
 import {  ProductService } from './product.services';
-import { MongoDataSource, ProductRepositoryImpl } from "../../infrastructure";
+import { MongoProductsDataSource, ProductRepositoryImpl } from "../../infrastructure";
 
 
 export class ProductsRoutes{
@@ -11,7 +11,7 @@ export class ProductsRoutes{
 
         //Arquitectura Limpia, creando el datasource (MOngo en este caso) para poder hacer la implementacion del repostory
         //Evitando el alto acoplamiento al datasource
-        const mongo = new MongoDataSource();
+        const mongo = new MongoProductsDataSource();
         const productRepositoryImpl = new ProductRepositoryImpl(mongo);
         const productService  = new ProductService(productRepositoryImpl);
         const productController = new ProductController(productService);

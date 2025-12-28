@@ -8,7 +8,7 @@ import {
   UpdateProductDTO
 } from "../../domain";
 
-export class MongoDataSource extends ProductDatasource {
+export class MongoProductsDataSource extends ProductDatasource {
   async getProducts(): Promise<ProductEntity[]> {
     const products = await ProductModel.find().lean(); // Siempre retorna [], el .lean() transforma los doc en objetos planos
     const productsToObject = products.map((product) =>
@@ -47,7 +47,6 @@ export class MongoDataSource extends ProductDatasource {
     // Esto limpia los métodos internos de Mongoose y deja solo los datos
     const productToObject = newProduct.toObject();
 
-    console.log(productToObject);
     const productEntity = ProductEntity.fromObject(productToObject);
     return productEntity;
   }

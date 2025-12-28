@@ -1,7 +1,7 @@
-import { CreateProductDTO } from "../../domain/dtos/createProduct.dto";
+import { CreateProductDTO } from "../../domain/dtos/product/createProduct.dto";
 import { ProductEntity } from "../../domain/entities/product.entity";
 import { ProductRepository } from '../../domain/repository/product.repository';
-import { UpdateProductDTO } from '../../domain/dtos/updateProduct.dto';
+import { UpdateProductDTO } from '../../domain/dtos/product/updateProduct.dto';
 
 export class ProductService{
 

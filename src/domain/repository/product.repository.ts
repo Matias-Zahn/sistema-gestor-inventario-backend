@@ -1,6 +1,6 @@
 import { ProductEntity } from "../entities/product.entity";
-import { CreateProductDTO } from '../dtos/createProduct.dto';
-import { UpdateProductDTO } from "../dtos/updateProduct.dto";
+import { CreateProductDTO } from '../dtos/product/createProduct.dto';
+import { UpdateProductDTO } from "../dtos/product/updateProduct.dto";
 
 export abstract class ProductRepository {
     abstract getProducts(): Promise<ProductEntity[]>

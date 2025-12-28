@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: SISTEMA GESTOR DE INVENTARIO
+  version: 1.0.0
+  description: API para la gestión de productos e historial de inventario.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor local
+
+components:
+  schemas:
+    CreateProductDTO:
+      type: object
+      required:
+        - name
+        - sku
+        - price
+        - costPrice
+        - stock
+        - category
+      properties:
+        sku:
+          type: string
+          example: "GALL-001"
+        name:
+          type: string
+          example: "Galletas de Chocolate"
+        price:
+          type: number
+          example: 50.00
+        costPrice:
+          type: number
+          example: 20.00
+        stock:
+          type: integer
+          example: 100
+        category:
+          type: string
+          example: "Alimentos"
+    UpdateProductDTO:
+      type: object
+      description: "Objeto para actualizar un producto. Todos los campos son opcionales."
+      properties:
+        name:
+          type: string
+          example: "Nuevo nombre de galletas"
+        price:
+          type: number
+          minimum: 0
+          description: "Debe ser un numero positivo"
+          example: 22.00
+        category:
+          type: string
+          minLength: 3
+          description: "Debe tener mas de 2 letras"
+          example: "Snacks Premium"
+        minStock:
+          type: integer
+          minimum: 0
+          example: 5
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, DISCONTINUED]
+    ProductEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "64f1..."
+        sku:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        costPrice:
+          type: number
+        stock:
+          type: integer
+        minStock:
+          type: integer
+        category:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, DISCONTINUED]
+        description:
+          type: string
+          nullable: true
+
+paths:
+  /products:
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductDTO'
+      responses:
+        201:
+          description: Producto creado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductEntity'
+
+  /products/{term}:
+    get:
+      summary: Obtener un producto por ID o SKU
+      tags:
+        - Products
+      parameters:
+        - name: term
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "694c62352305cdf78caac291"
+      responses:
+        200:
+          description: Datos del producto
+        404:
+          description: No se encontro el producto por el termino {term}
+    
+    patch:
+      summary: Actualizar un producto
+      tags:
+        - Products
+      parameters:
+        - name: term
+          in: path
+          required: true
+          description: "ID o SKu como termino de busqueda del producto"
+          schema:
+            type: string
+          example: "694c62352305cdf78caac291"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductDTO"
+      responses:
+        200:
+          description: Producto actualizado con exito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductEntity"
+        400:
+          description: Error de validacion (ej, precio ngeativo o categoria demasiado corta)
+        404:
+          description: Producto no encontrado
+    delete:
+      summary: Eliminar un producto
+      tags:
+        - Products
+      parameters:
+        - name: term
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "694c62352305cdf78caac291"
+      responses:
+        204:
+          description: Producto eliminado
+        404:
+          description: Producto no encontrado
+  /inventory/history:
+    get:
+      summary: GET HISTORY INVENTORY
+      tags:
+        - Inventory
+      responses:
+        200:
+          description: Historial de movimientos obtenido con éxito
