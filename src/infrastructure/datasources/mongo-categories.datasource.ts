@@ -1,21 +1,51 @@
-import { CategoryDataSource } from "../../domain/datasources/category.datasource";
-import { CategoryEntity } from "../../domain/entities/category.entity";
+import { isValidObjectId } from 'mongoose';
+
+import { CategoryDataSource, CreateCategoryDTO, CustomError, UpdateCategoryDTO, CategoryEntity } from "../../domain";
+import { CategoryModel } from "../../data/mongo/models/category.model";
 
 export class MongoCategoriesDataSource implements CategoryDataSource {
-    getAllCategory(): Promise<CategoryEntity[]> {
-        throw new Error("Method not implemented.");
+    async getAllCategory(): Promise<CategoryEntity[]> {
+        const categories = await CategoryModel.find().lean();
+        return categories.map((category) => CategoryEntity.fromObject(category));
     }
-    getOneCategory(id: string): Promise<CategoryEntity> {
-        throw new Error("Method not implemented.");
+
+    async getOneCategory(term: string): Promise<CategoryEntity> {
+
+        const filter = isValidObjectId(term) ? { _id: term } : { name: term };
+        const existCategory = await CategoryModel.findOne(filter).lean();
+
+        if(!existCategory) throw CustomError.notFound( `Categoria no encontrada por el termino: ${term}` );
+
+        return CategoryEntity.fromObject(existCategory);
+
     }
-    createCategory(): Promise<CategoryEntity> {
-        throw new Error("Method not implemented.");
+    async createCategory(createCategoryDTO: CreateCategoryDTO): Promise<CategoryEntity> {
+        const existCategory = await CategoryModel.findOne({name: createCategoryDTO.name});
+        if(existCategory) throw CustomError.badRequest('La categoria ya existe')
+        const newCategory = await CategoryModel.create(createCategoryDTO);
+        if(!newCategory) throw CustomError.internalServerError('Algo ocurrio con la creacion de la categoria');
+
+        return CategoryEntity.fromObject(newCategory);
     }
-    updateCategory(): Promise<CategoryEntity> {
-        throw new Error("Method not implemented.");
+
+    async updateCategory(updateCategoryDTO: UpdateCategoryDTO): Promise<CategoryEntity> {
+
+        const category = await this.getOneCategory(updateCategoryDTO.term);
+        
+        const updated = await CategoryModel.findByIdAndUpdate(category.id, updateCategoryDTO.values, {new: true});
+
+        if(!updated) throw CustomError.internalServerError('ALgo ocurrio cuando se intentaba actualizar la categoria')
+
+        return CategoryEntity.fromObject(updated);
+
     }
-    deleteCategory(): Promise<null> {
-        throw new Error("Method not implemented.");
+
+    async deleteCategory(term: string): Promise<null> {
+        const category = await this.getOneCategory(term);
+
+        await CategoryModel.findByIdAndDelete(category.id);
+
+        return null;
     }
 
 }

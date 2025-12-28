@@ -11,16 +11,38 @@ export class CreateProductDTO {
   public static create(object: {
     [key: string]: any;
   }): [string?, CreateProductDTO?] {
-    const { name, sku, price, stock, category, costPrice } = object;
 
-        if(!name) return ['Missign Name']
-        if(!sku) return ['Missign sku']
-        if(!price) return ['Missign price']
-        if(price < 0 || isNaN(price)) return ['Price must be a valid positive number']
-        if(!stock) return ['Missign stock']
-        if(!category) return ['Missign category']
-        if(!costPrice) return ['Missign price']
-         if(costPrice < 0 || isNaN(costPrice)) return ['costPrice must be a valid positive number']
+
+    if (!object) return ['No se enviaron datos'];
+
+    const { name, sku, category } = object;
+    // Extraemos estos aparte para convertirlos
+    let { price, costPrice, stock } = object;
+
+    // --- Validaciones de Strings ---
+    if (!name) return ['Missing Name'];
+    if (!sku) return ['Missing SKU'];
+    if (!category) return ['Missing Category'];
+    
+    // Validación de MongoID (Regex de 24 caracteres hex)
+    if (!/^[0-9a-fA-F]{24}$/.test(category)) return ['Invalid Category ID'];
+
+    // --- Conversión y Validación de Números ---
+    // Convertimos a número por si vienen como strings ("100")
+    price = Number(price);
+    costPrice = Number(costPrice);
+    stock = Number(stock);
+
+    // Validación Precio
+    // Usamos isNaN para ver si la conversión falló
+    if (isNaN(price) || price < 0) return ['Price must be a valid positive number'];
+    
+    // Validación Costo
+    if (isNaN(costPrice) || costPrice < 0) return ['Cost Price must be a valid positive number'];
+
+    // Validación Stock
+    // Solo fallamos si es negativo o no es número.
+    if (isNaN(stock) || stock < 0) return ['Stock must be a valid positive number'];
 
     return [undefined, new CreateProductDTO(name, sku, price, costPrice,stock, category)];
   }

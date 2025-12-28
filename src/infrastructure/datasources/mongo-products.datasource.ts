@@ -9,8 +9,10 @@ import {
 } from "../../domain";
 
 export class MongoProductsDataSource extends ProductDatasource {
+
+
   async getProducts(): Promise<ProductEntity[]> {
-    const products = await ProductModel.find().lean(); // Siempre retorna [], el .lean() transforma los doc en objetos planos
+    const products = await ProductModel.find().populate('category', 'name').lean(); // Siempre retorna [], el .lean() transforma los doc en objetos planos
     const productsToObject = products.map((product) =>
       ProductEntity.fromObject(product)
     );

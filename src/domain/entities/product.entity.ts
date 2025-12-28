@@ -9,7 +9,7 @@ export class ProductEntity {
     public costPrice: number,
     public stock: number,
     public minStock: number,
-    public category: string,
+    public category: any,  //TODO: REVISAR ESTA PARTE PARA QUE ESPERE UN OBJETO (TIPAR)
     public status: "ACTIVE" | "INACTIVE" | "DISCONTINUED",
     public description?: string
   ) {}
