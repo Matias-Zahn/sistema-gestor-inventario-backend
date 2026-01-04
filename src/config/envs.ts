@@ -8,8 +8,7 @@ export const envs = {
   MONGO_DBNAME: get('MONGO_DBNAME').required().asString(),
   MONGO_URL: get('MONGO_URL').required().asString(),
   MONGO_USERNAME: get('MONGO_USERNAME').required().asString(),
-  
-
+  DISCORD_WEBHOOK_URL: get('DISCORD_WEBHOOK_URL').required().asString(),
 }
 
 

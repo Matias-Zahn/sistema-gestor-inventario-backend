@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
-import { ProductService } from "./product.services";
 import { CreateProductDTO, CustomError, UpdateProductDTO } from "../../domain";
+import { ProductService } from "./product.services";
+import { SellProductDTO } from "../../domain/dtos/product/sellProduct.dto";
 
 
-//TODO: TERMINAR LOS CONTROLADORES ASIMISMO CON EL SERIVICIO DE PRODUCTOS IMPLEMENTANDO LOS GETS, UPDATE AND DELETE
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+  ) {}
 
   private handleError = (error: any, res: Response) => {
     if(error instanceof CustomError) return res.status(error.statusCode).json(error.errorMessage);
@@ -65,5 +67,17 @@ export class ProductController {
         .then(() => res.status(204).json(null))
         .catch((err) => this.handleError(err, res))
 
+  }
+
+
+  public sellProduct = (req: Request, res: Response) => {
+    const {term} = req.params; 
+      const [error, sellProductDto] = SellProductDTO.create({...req.body, term })
+
+      if(error) return res.status(400).json({error});
+
+      this.productService.sellProduct(sellProductDto!)
+        .then((product) => res.status(200).json({product}))
+        .catch((err) => this.handleError(err, res))
   }
 }

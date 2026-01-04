@@ -2,6 +2,8 @@ import { Router } from "express";
 import { ProductController } from "./products.controller";
 import {  ProductService } from './product.services';
 import { MongoProductsDataSource, ProductRepositoryImpl } from "../../infrastructure";
+import { DiscordService } from '../../infrastructure/discord/discord.service';
+import { envs } from "../../config/envs";
 
 
 export class ProductsRoutes{
@@ -13,7 +15,8 @@ export class ProductsRoutes{
         //Evitando el alto acoplamiento al datasource
         const mongo = new MongoProductsDataSource();
         const productRepositoryImpl = new ProductRepositoryImpl(mongo);
-        const productService  = new ProductService(productRepositoryImpl);
+        const discordService = new DiscordService(envs.DISCORD_WEBHOOK_URL);
+        const productService  = new ProductService(productRepositoryImpl, discordService);
         const productController = new ProductController(productService);
 
         route.get(  '/', productController.getProducts  )
@@ -21,6 +24,8 @@ export class ProductsRoutes{
         route.post(  '/', productController.createProduct  )
         route.patch(  '/:term', productController.updateProduct  )
         route.delete(  '/:term', productController.deleteProduct  )
+        route.post(  '/:term/sell', productController.sellProduct)
+
 
         return route
     }

@@ -1,5 +1,13 @@
 import { CustomError } from "../errors/customError";
 
+interface ProductCategory {
+  id: string,
+  name: string,
+  slug?: string
+}
+
+
+
 export class ProductEntity {
   constructor(
     public id: string,
@@ -9,7 +17,7 @@ export class ProductEntity {
     public costPrice: number,
     public stock: number,
     public minStock: number,
-    public category: any,  //TODO: REVISAR ESTA PARTE PARA QUE ESPERE UN OBJETO (TIPAR)
+    public category: ProductCategory | string, 
     public status: "ACTIVE" | "INACTIVE" | "DISCONTINUED",
     public description?: string
   ) {}
@@ -31,7 +39,7 @@ export class ProductEntity {
 
 
     if(!id && !_id) throw CustomError.badRequest('Missign id');
-    if(!sku)throw CustomError.badRequest('Missign sjku ');
+    if(!sku)throw CustomError.badRequest('Missign sku ');
     if(!name)throw CustomError.badRequest('Missign name ');
     if (price === undefined || price === null) throw CustomError.badRequest('Missing price');
     if (costPrice === undefined || costPrice === null) throw CustomError.badRequest('Missing costPrice');
@@ -39,9 +47,22 @@ export class ProductEntity {
     if (minStock === undefined || minStock === null) throw CustomError.badRequest('Missing minStock');
     if(!category)throw CustomError.badRequest('Missign category ');
 
+    let categoryResult;
+
+    if (typeof category === 'object') {
+
+      categoryResult = {
+        id: category._id.toString(),
+        name: category.name,
+        slug: category.slug
+      }
+    }else {
+      categoryResult = category.toString()
+    }
+
     const finalStatus = status || "ACTIVE";
 
-    return new ProductEntity(id || _id, sku, name, price, costPrice, stock, minStock, category, finalStatus, description)
+    return new ProductEntity(id || _id, sku, name, price, costPrice, stock, minStock, categoryResult, finalStatus, description)
 
   }
 }

@@ -1,18 +1,27 @@
 import { isValidObjectId } from "mongoose";
 import { ProductModel } from "../../data/mongo/models/product.model";
+import { SellProductDTO } from '../../domain/dtos/product/sellProduct.dto';
 import {
   CreateProductDTO,
   CustomError,
   ProductDatasource,
   ProductEntity,
-  UpdateProductDTO
+  UpdateProductDTO,
 } from "../../domain";
 
 export class MongoProductsDataSource extends ProductDatasource {
 
+  //HELPER
+
+  private getFilter(term: string){
+    return isValidObjectId(term) ? { _id: term} : {sku: term};
+  }
+
 
   async getProducts(): Promise<ProductEntity[]> {
-    const products = await ProductModel.find().populate('category', 'name').lean(); // Siempre retorna [], el .lean() transforma los doc en objetos planos
+    const products = await ProductModel.find()
+      .populate("category", "name")
+      .lean(); // Siempre retorna [], el .lean() transforma los doc en objetos planos
     const productsToObject = products.map((product) =>
       ProductEntity.fromObject(product)
     );
@@ -20,7 +29,7 @@ export class MongoProductsDataSource extends ProductDatasource {
   }
 
   async getOneProduct(term: string): Promise<ProductEntity> {
-    const filter = isValidObjectId(term) ? { _id: term } : { sku: term };
+    const filter = this.getFilter(term)
 
     const product = await ProductModel.findOne(filter).lean();
 
@@ -53,15 +62,18 @@ export class MongoProductsDataSource extends ProductDatasource {
     return productEntity;
   }
 
-  async updateProduct(updateProductDTO: UpdateProductDTO): Promise<ProductEntity> {
-
-    const product: ProductEntity = await this.getOneProduct(updateProductDTO.term);
+  async updateProduct(
+    updateProductDTO: UpdateProductDTO
+  ): Promise<ProductEntity> {
+    const product: ProductEntity = await this.getOneProduct(
+      updateProductDTO.term
+    );
 
     const updated = await ProductModel.findByIdAndUpdate(
-      product.id, 
+      product.id,
       updateProductDTO.values,
-      {new: true}
-    ).lean()
+      { new: true }
+    ).lean();
 
     return ProductEntity.fromObject(updated!);
   }
@@ -77,5 +89,32 @@ export class MongoProductsDataSource extends ProductDatasource {
       );
 
     return null;
+  }
+
+  async decrementStock(sellProductDTO: SellProductDTO): Promise<ProductEntity> {
+
+    const { term, quantity} = sellProductDTO;
+
+    const filter = this.getFilter(term);
+
+    const query = {
+      ...filter,
+      stock : {$gte: quantity }
+    }
+
+    const updatedProduct = await ProductModel.findOneAndUpdate(
+      query,
+      { $inc: { stock: -quantity } },
+      { new: true }
+    )
+      .populate("category", "name")
+      .lean();
+
+    if (!updatedProduct)
+      throw CustomError.badRequest(
+        "Product not found or stock is insufficient "
+      );
+
+    return ProductEntity.fromObject(updatedProduct);
   }
 }
