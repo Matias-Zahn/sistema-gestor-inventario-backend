@@ -1,16 +1,11 @@
-import 'dotenv/config';
-import { get } from 'env-var';
-
+import "dotenv/config";
+import { get } from "env-var";
 
 export const envs = {
-
-  PORT: get('PORT').required().asPortNumber(),
-  MONGO_DBNAME: get('MONGO_DBNAME').required().asString(),
-  MONGO_URL: get('MONGO_URL').required().asString(),
-  MONGO_USERNAME: get('MONGO_USERNAME').required().asString(),
-  DISCORD_WEBHOOK_URL: get('DISCORD_WEBHOOK_URL').required().asString(),
-}
-
-
-
-
+  PORT: get("PORT").required().asPortNumber(),
+  MONGO_DBNAME: get("MONGO_DBNAME").required().asString(),
+  MONGO_URL: get("MONGO_URL").required().asString(),
+  MONGO_USERNAME: get("MONGO_USERNAME").required().asString(),
+  DISCORD_WEBHOOK_URL: get("DISCORD_WEBHOOK_URL").required().asString(),
+  JWT_SECRET_KEY: get("JWT_SECRET_KEY").required().asString(),
+};

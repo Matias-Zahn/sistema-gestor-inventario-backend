@@ -12,7 +12,7 @@ export class AuthRoutes {
     const controller = new AuthController(service);
 
     routes.post("/login", controller.login);
-    routes.get("/register", controller.register);
+    routes.post("/register", controller.register);
 
     return routes;
   }

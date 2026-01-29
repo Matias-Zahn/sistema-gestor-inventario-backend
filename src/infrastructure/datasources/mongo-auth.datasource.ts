@@ -1,14 +1,37 @@
-import { AuthDataSource, RegisterDTO, UserEntity } from "../../domain";
+import { UserModel } from "../../data/mongo/models/user.model";
+import {
+  AuthDataSource,
+  CustomError,
+  LoginDTO,
+  RegisterDTO,
+  UserEntity,
+} from "../../domain";
 
 export class MongoAuthDatasource implements AuthDataSource {
-    register(registerDto: RegisterDTO): Promise<UserEntity> {
-        throw new Error("Method not implemented.");
-    }
-    login(registerDto: RegisterDTO): Promise<UserEntity> {
-        throw new Error("Method not implemented.");
-    }
+  async register(registerDto: RegisterDTO): Promise<UserEntity> {
+    const { email, name, password } = registerDto;
 
+    const user = await UserModel.findOne({
+      email,
+    });
 
+    if (user) throw CustomError.badRequest("User exists");
 
+    const userModel = await UserModel.create({
+      name,
+      email,
+      password,
+    });
 
+    return UserEntity.fromObject(userModel);
+  }
+  async findUserByEmail(loginDTO: LoginDTO): Promise<UserEntity | null> {
+    const user = await UserModel.findOne({
+      email: loginDTO.email,
+    });
+
+    if (!user) return null;
+
+    return UserEntity.fromObject(user);
+  }
 }
