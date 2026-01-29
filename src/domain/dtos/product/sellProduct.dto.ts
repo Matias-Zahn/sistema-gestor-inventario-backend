@@ -2,7 +2,7 @@ import { CustomError } from "../../errors/customError"
 
 export class SellProductDTO{
 
-    constructor(
+    private constructor(
         public readonly term: string,
         public readonly quantity: number
     ){}
