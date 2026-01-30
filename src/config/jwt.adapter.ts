@@ -9,7 +9,11 @@ export class JWTAdapter {
         envs.JWT_SECRET_KEY,
         { expiresIn: duration } as SignOptions,
         (err, token) => {
-          if (err) return resolve(null);
+          if (err) {
+            console.log(err);
+
+            return resolve(null);
+          }
 
           resolve(token);
         },

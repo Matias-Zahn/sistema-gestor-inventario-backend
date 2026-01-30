@@ -1,4 +1,4 @@
-import { UserModel } from "../../data/mongo/models/user.model";
+import { UserModel } from "../../data/mongoData/models/user.model";
 import {
   AuthDataSource,
   CustomError,
@@ -8,6 +8,16 @@ import {
 } from "../../domain";
 
 export class MongoAuthDatasource implements AuthDataSource {
+  async findUserByID(id: string): Promise<UserEntity | null> {
+    console.log("LLEGUE ACA");
+
+    const user = await UserModel.findById(id);
+
+    if (!user) return null;
+
+    return UserEntity.fromObject(user);
+  }
+
   async register(registerDto: RegisterDTO): Promise<UserEntity> {
     const { email, name, password } = registerDto;
 

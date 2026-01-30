@@ -1,4 +1,4 @@
-import { BCryptAdapter } from "../../config";
+import { BCryptAdapter, JWTAdapter } from "../../config";
 import { CustomError, RegisterDTO } from "../../domain";
 import { AuthRepository } from "../../domain";
 import { LoginDTO } from "../../domain/dtos/auth/login.dto";
@@ -19,7 +19,11 @@ export class AuthService {
 
     const { password, ...restUser } = user;
 
-    return { user: restUser };
+    const token = await JWTAdapter.generateToken({ id: user.id });
+    if (!token)
+      throw CustomError.internalServerError("Error while creating JWT");
+
+    return { user: restUser, token: token };
   }
 
   public async login(loginDTO: LoginDTO) {
@@ -33,8 +37,13 @@ export class AuthService {
 
     const { password, ...rest } = user;
 
+    const token = await JWTAdapter.generateToken({ id: user.id });
+    if (!token)
+      throw CustomError.internalServerError("Error while creating JWT");
+
     return {
       user: rest,
+      token,
     };
   }
 }

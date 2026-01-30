@@ -9,6 +9,10 @@ import {
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private readonly dataSource: AuthDataSource) {}
 
+  findUserByID(id: string): Promise<UserEntity | null> {
+    return this.dataSource.findUserByID(id);
+  }
+
   register(registerDto: RegisterDTO): Promise<UserEntity> {
     return this.dataSource.register(registerDto);
   }
