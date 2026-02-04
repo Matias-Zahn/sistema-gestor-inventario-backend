@@ -1,9 +1,9 @@
 export class CustomError extends Error {
   private constructor(
-    public errorMessage: string,
-    public statusCode: number
+    public message: string,
+    public statusCode: number,
   ) {
-    super(errorMessage);
+    super(message);
   }
 
   public static badRequest(message: string) {
